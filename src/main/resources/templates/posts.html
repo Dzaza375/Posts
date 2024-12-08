@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Посты</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="/">Главная</a>
+        <a href="/posts/add">Добавить пост</a>
+    </nav>
+</header>
+    <h1>Сегодняшняя лента</h1>
+    <div class="posts-container">
+        <div th:each="el : ${posts}" class="post-item">
+            <div class="post-details">
+                <p th:text="${el.author}" class="post-author"></p>
+                <img th:src="${el.imageURL}" class="post-image">
+                <h3 th:text="${el.title}"></h3>
+
+                <a th:href="'/posts/' + ${el.id} + '/edit'" class="edit-button">Редактировать</a>
+            </div>
+
+            <div class="comments">
+                <div th:if="${#lists.size(el.comments) > 0}">
+                    <h4>Комментарии: </h4>
+                    <div class="comments-container">
+                        <div th:each="com : ${comments}" th:if="${com.post.id == el.id}" class="comment-item">
+                            <div class="comment-content">
+                                <p th:utext="'<b>' + ${com.commentAuthor} + ': </b>' + ${com.commentContext}"></p>
+                            </div>
+
+                            <form th:action="'/posts/' + ${com.commentId} + '/remove-comment'" method="post" class="delete-comment-button">
+                                <button type="submit">
+                                    <img src="/images/trash-button.png" alt="deleteComment" class="trash-icon">
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Добавить комментарий:</h4>
+                <form th:action="'/posts/' + ${el.id} + '/add-comment'" method="post" class="comment-form">
+                    <input type="text" name="commentAuthor" placeholder="Введите автора" required>
+                    <input type="text" name="commentContext" placeholder="Введите комментарий" required>
+                    <button type="submit">Опубликовать комментарий</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
