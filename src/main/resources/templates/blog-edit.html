@@ -8,17 +8,25 @@
 <body>
     <header>
         <nav>
-            <a href="/posts">Назад</a>
+            <a th:href="@{/posts}">Назад</a>
         </nav>
     </header>
-    <form method="post">
-        <input type="text" name="title" th:value="${post.title}" placeholder="Введите подпись к посту">
-        <input type="text" name="author" th:value="${post.author}" placeholder="Введите автора поста">
-        <input type="text" name="imageURL" th:value="${post.imageURL}" placeholder="URL изображения">
+    <form method="POST" th:object="${post}">
+        <input type="hidden" name="_method" value="PATCH">
+
+        <input type="text" th:field="*{title}" th:value="${post.title}" placeholder="Введите подпись к посту">
+        <div style="color: red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error-message">Title error</div>
+
+        <input type="text" th:field="*{author}" th:value="${post.author}" placeholder="Введите автора поста">
+        <div style="color: red" th:if="${#fields.hasErrors('author')}" th:errors="*{author}" class="error-message">Author error</div>
+
+        <input type="text" th:field="*{imageURL}" th:value="${post.imageURL}" placeholder="URL изображения">
+        <div style="color: red" th:if="${#fields.hasErrors('imageURL')}" th:errors="*{imageURL}" class="error-message">ImageURL error</div>
         <button type="submit">Сохранить изменения</button>
     </form>
 
-    <form th:action="'/posts/' + ${post.id} + '/remove'" method="post" style="margin-top: 20px;">
+    <form th:action="@{'/posts/' + ${post.id} + '/remove'}" method="POST" style="margin-top: 20px;">
+        <input type="hidden" name="_method" value="DELETE">
         <button class="delete-button" type="submit">Удалить пост</button>
     </form>
 

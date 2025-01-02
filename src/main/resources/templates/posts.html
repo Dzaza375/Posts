@@ -8,8 +8,8 @@
 <body>
 <header>
     <nav>
-        <a href="/">Главная</a>
-        <a href="/posts/add">Добавить пост</a>
+        <a th:href="@{/}">Главная</a>
+        <a th:href="@{/posts/add}">Добавить пост</a>
     </nav>
 </header>
     <h1>Сегодняшняя лента</h1>
@@ -20,19 +20,20 @@
                 <img th:src="${el.imageURL}" class="post-image">
                 <h3 th:text="${el.title}"></h3>
 
-                <a th:href="'/posts/' + ${el.id} + '/edit'" class="edit-button">Редактировать</a>
+                <a th:href="@{'/posts/' + ${el.id} + '/edit'}" class="edit-button">Редактировать</a>
             </div>
 
             <div class="comments">
                 <div th:if="${#lists.size(el.comments) > 0}">
                     <h4>Комментарии: </h4>
                     <div class="comments-container">
-                        <div th:each="com : ${comments}" th:if="${com.post.id == el.id}" class="comment-item">
+                        <div th:each="com : ${el.comments}" th:if="${com.post.id == el.id}" class="comment-item">
                             <div class="comment-content">
                                 <p th:utext="'<b>' + ${com.commentAuthor} + ': </b>' + ${com.commentContext}"></p>
                             </div>
 
-                            <form th:action="'/posts/' + ${com.commentId} + '/remove-comment'" method="post" class="delete-comment-button">
+                            <form th:action="@{'/posts/' + ${com.commentId} + '/remove-comment'}" method="POST" class="delete-comment-button">
+                                <input type="hidden" name="_method" value="DELETE">
                                 <button type="submit">
                                     <img src="/images/trash-button.png" alt="deleteComment" class="trash-icon">
                                 </button>
@@ -42,11 +43,23 @@
                 </div>
 
                 <h4>Добавить комментарий:</h4>
-                <form th:action="'/posts/' + ${el.id} + '/add-comment'" method="post" class="comment-form">
-                    <input type="text" name="commentAuthor" placeholder="Введите автора" required>
-                    <input type="text" name="commentContext" placeholder="Введите комментарий" required>
-                    <button type="submit">Опубликовать комментарий</button>
-                </form>
+                <div th:if="${el.id == postId}">
+                    <form th:action="@{'/posts/' + ${el.id} + '/add-comment'}" method="POST" th:object="${comment}" class="comment-form">
+                        <input type="text" th:field="*{commentAuthor}" placeholder="Введите автора">
+                        <div style="color: red" th:if="${#fields.hasErrors('commentAuthor')}" th:errors="*{commentAuthor}" class="error-message">Author error</div>
+
+                        <input type="text" th:field="*{commentContext}" placeholder="Введите комментарий">
+                        <div style="color: red" th:if="${#fields.hasErrors('commentContext')}" th:errors="*{commentContext}" class="error-message">Comment context error</div>
+                        <button type="submit">Опубликовать комментарий</button>
+                    </form>
+                </div>
+                <div th:if="${el.id != postId}">
+                    <form th:action="@{'/posts/' + ${el.id} + '/add-comment'}" method="POST" th:object="${comment}" class="comment-form">
+                        <input type="text" name="commentAuthor" placeholder="Введите автора">
+                        <input type="text" name="commentContext" placeholder="Введите комментарий">
+                        <button type="submit">Опубликовать комментарий</button>
+                    </form>
+                </div>
             </div>
 
         </div>
